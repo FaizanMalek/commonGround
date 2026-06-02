@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommonGround — What shelters need right now</title>
+    <script src="/js/theme-init.js"></script>
     <script src="/js/i18n.js"></script>
+    <link rel="stylesheet" href="/css/theme.css">
     <meta name="description" content="See what Moncton's homeless-serving organizations need and donate directly to those with the greatest need.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -209,13 +211,19 @@
         }
     </style>
 </head>
-<body>
+<body class="public-page">
 
 <nav class="site-nav" style="background:#fff; border-bottom:1px solid #E8ECF1; box-shadow:0 1px 3px rgba(0,0,0,.03);">
     <div class="nav-inner">
         <a href="/" class="nav-brand"><img src="/assets/images/logo.png" alt="CommonGround"> <span data-i18n="navBrand" style="color:#1A2332; font-weight:700; font-size:1.15rem;">CommonGround</span></a>
-        <div class="nav-actions">
-            <button type="button" class="btn btn-ghost btn-sm" onclick="i18n.switchLocale()" title="EN / FR" style="color:#6B7B8F; border:1px solid #D8DEE6;">EN / FR</button>
+        <div class="nav-actions" style="display:flex;align-items:center;gap:.5rem;">
+            <div class="cg-prefs" role="group" aria-label="Display preferences">
+                <button type="button" class="cg-pref-btn" id="cg-locale-btn" title="Language">FR</button>
+                <button type="button" class="cg-pref-btn cg-theme-btn" id="cg-theme-btn" title="Toggle theme" aria-label="Toggle theme">
+                    <span class="cg-icon-moon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+                    <span class="cg-icon-sun" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="5"/></svg></span>
+                </button>
+            </div>
             <a href="/login" class="btn btn-ghost btn-sm" data-i18n="navStaffLogin" style="color:#6B7B8F; border:1px solid #D8DEE6;">Staff login</a>
         </div>
     </div>
@@ -285,10 +293,16 @@
     <div class="pagination" id="pagination" style="display:none"></div>
 </div>
 
+<script src="/js/site-prefs.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
 <script>
+    CGPrefs.init();
     i18n.apply();
+    window.addEventListener('cg-locale-change', function () {
+        i18n.apply();
+        if (typeof renderPage === 'function' && allOrgs.length) renderPage();
+    });
     const CAT_LABELS    = i18n.CAT_LABELS();
     const URGENCY_LABELS = i18n.URGENCY_LABELS();
     const URGENCY_RANK  = { critical: 0, high: 1, medium: 2, low: 3 };
