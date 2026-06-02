@@ -1,0 +1,211 @@
+/* CommonGround — locale/theme controls + public & login pages (portals use dashboard.css) */
+
+.cg-prefs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Match dashboard topbar buttons on public / auth pages */
+.cg-pref-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.65rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.cg-pref-btn:hover {
+  background: #f8fafc;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.cg-pref-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.cg-theme-btn {
+  min-width: 2.25rem;
+  padding: 0;
+}
+
+.cg-theme-btn .cg-icon-moon,
+.cg-theme-btn .cg-icon-sun {
+  display: none;
+  line-height: 0;
+}
+
+html:not([data-theme='dark']) .cg-theme-btn .cg-icon-moon {
+  display: block;
+}
+
+html[data-theme='dark'] .cg-theme-btn .cg-icon-sun {
+  display: block;
+}
+
+.auth-prefs {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+/* ── Public + auth dark (true black, same family as coordinator dashboard) ── */
+html[data-theme='dark'] {
+  --cg-pref-border: #334155;
+  --cg-pref-bg: #0f172a;
+  --cg-pref-fg: #e2e8f0;
+  --cg-pref-border-hover: #3b82f6;
+  --cg-pref-fg-hover: #93c5fd;
+  --cg-pref-bg-hover: #1e293b;
+}
+
+html[data-theme='dark'] body.auth-page {
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --surface: #0a0a0a;
+  --purple: #7c3aed;
+  --purple-dark: #6d28d9;
+  --purple-deep: #312e81;
+}
+
+html[data-theme='dark'] .auth-form-panel {
+  background: #0a0a0a;
+}
+
+html[data-theme='dark'] .auth-heading h1,
+html[data-theme='dark'] .auth-logo-name,
+html[data-theme='dark'] .field-label {
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .auth-heading p,
+html[data-theme='dark'] .auth-remember {
+  color: #94a3b8;
+}
+
+html[data-theme='dark'] .field-input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .field-input::placeholder {
+  color: #64748b;
+}
+
+html[data-theme='dark'] .auth-brand-panel {
+  background: linear-gradient(145deg, #312e81 0%, #1e1b4b 45%, #000000 100%);
+}
+
+html[data-theme='dark'] .auth-brand-name {
+  color: #e0e7ff;
+}
+
+html[data-theme='dark'] .auth-brand-tagline {
+  color: #a5b4fc;
+}
+
+html[data-theme='dark'] .login-panel,
+html[data-theme='dark'] .login-inner {
+  background: #0a0a0a;
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .login-heading h1,
+html[data-theme='dark'] .login-brand-name,
+html[data-theme='dark'] .form-label {
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .login-heading p {
+  color: #94a3b8;
+}
+
+html[data-theme='dark'] .form-control {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] body.public-page {
+  background: #000000;
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .public-page .site-nav {
+  background: #0a0a0a;
+  border-color: #1e293b !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='dark'] .public-page .nav-brand span {
+  color: #f1f5f9 !important;
+}
+
+html[data-theme='dark'] .public-page .hero {
+  background: linear-gradient(160deg, #1e293b 0%, #0f172a 50%, #000000 100%) !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme='dark'] .public-page .hero h1,
+html[data-theme='dark'] .public-page .hero p {
+  color: #f1f5f9 !important;
+}
+
+html[data-theme='dark'] .public-page .hero p.text-muted,
+html[data-theme='dark'] .public-page .text-muted {
+  color: #94a3b8 !important;
+}
+
+html[data-theme='dark'] .public-page .org-row,
+html[data-theme='dark'] .public-page .card,
+html[data-theme='dark'] .filters-bar {
+  background: #0a0a0a;
+  border-color: #1e293b;
+}
+
+html[data-theme='dark'] .public-page input,
+html[data-theme='dark'] .public-page select {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .donate-page,
+html[data-theme='dark'] .give-page {
+  background: linear-gradient(160deg, #1e293b 0%, #000000 50%, #0f172a 100%);
+}
+
+html[data-theme='dark'] .donate-wrapper-card,
+html[data-theme='dark'] .give-wrapper-card {
+  background: #0a0a0a;
+  border: 1px solid #1e293b;
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .donate-content .site-nav,
+html[data-theme='dark'] .give-content .site-nav {
+  background: rgba(10, 10, 10, 0.95);
+  border-bottom-color: #1e293b;
+}
+
+html[data-theme='dark'] .donate-content .site-nav .nav-brand span,
+html[data-theme='dark'] .donate-content .site-nav .nav-links a,
+html[data-theme='dark'] .give-content .site-nav .nav-brand span,
+html[data-theme='dark'] .give-content .site-nav .nav-links a {
+  color: #e2e8f0;
+}

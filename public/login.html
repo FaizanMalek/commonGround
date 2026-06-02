@@ -4,56 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In — CommonGround</title>
+    <script src="/js/theme-init.js"></script>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/theme.css">
 </head>
-<body style="background:var(--color-surface);">
+<body class="auth-page" style="background:var(--color-surface);">
 
 <div class="login-split">
 
-    <!-- Left panel: form -->
-    <div class="login-panel">
+    <div class="login-panel" style="position:relative;">
+        <div class="auth-prefs" id="auth-prefs-mount"></div>
         <div class="login-inner">
 
-            <!-- Brand -->
             <div class="login-brand">
                 <img src="/assets/images/logo.png" alt="CommonGround logo" class="login-brand-logo">
                 <span class="login-brand-name">Common Ground</span>
             </div>
 
-            <!-- Heading -->
             <div class="login-heading">
-                <h1>Welcome!</h1>
-                <p>Sign in by entering the information below</p>
+                <h1 data-i18n="authWelcome">Welcome!</h1>
+                <p data-i18n="authSubtitle">Sign in by entering the information below</p>
             </div>
 
-            <!-- Error notice -->
             <div id="login-error" class="login-error-notice"></div>
 
-            <!-- Form -->
             <form id="login-form" class="login-form" onsubmit="handleLogin(event)" novalidate>
 
                 <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
+                    <label class="form-label" for="email" data-i18n="authEmail">Email Address</label>
                     <input type="email" id="email" class="form-control"
-                           autocomplete="email" placeholder="email@example.com" required>
-                    <span class="form-error" id="err-email">Please enter a valid email address.</span>
+                           autocomplete="email" data-i18n-placeholder="emailPlaceholder" placeholder="email@example.com" required>
+                    <span class="form-error" id="err-email" data-i18n="authErrEmail">Please enter a valid email address.</span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
+                    <label class="form-label" for="password" data-i18n="authPassword">Password</label>
                     <input type="password" id="password" class="form-control"
                            autocomplete="current-password" placeholder="••••••••••••" required>
-                    <span class="form-error" id="err-password">Please enter your password.</span>
+                    <span class="form-error" id="err-password" data-i18n="authErrPassword">Please enter your password.</span>
                 </div>
 
                 <label class="login-remember">
                     <input type="checkbox" id="remember-me">
-                    Remember Me
+                    <span data-i18n="authRemember">Remember Me</span>
                 </label>
 
                 <button type="submit" class="login-btn" id="login-btn">
                     <span class="spinner"></span>
-                    <span class="btn-text">Continue</span>
+                    <span class="btn-text" data-i18n="authContinue">Continue</span>
                 </button>
 
             </form>
@@ -61,19 +59,23 @@
         </div>
     </div>
 
-    <!-- Right panel: purple gradient + logo -->
     <div class="login-right">
         <div class="login-right-dots"></div>
         <img src="/assets/images/logo.png" alt="CommonGround" class="login-right-logo">
         <p class="login-right-tagline">CommonGround</p>
-        <p class="login-right-sub">Donation Coordination Network</p>
+        <p class="login-right-sub" data-i18n="authTagline">Donation Coordination Network</p>
     </div>
 
 </div>
 
+<script src="/js/i18n.js"></script>
+<script src="/js/site-prefs.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
 <script>
+    document.getElementById('auth-prefs-mount').innerHTML = CGPrefs.toolbarHtml();
+    CGPrefs.init();
+
     (async function () {
         try {
             const res = await auth.me();
@@ -131,7 +133,7 @@
             const res = await auth.login(emailEl.value.trim(), passEl.value);
             redirectAfterLogin(res.data);
         } catch (err) {
-            errEl.textContent = err.message || 'Sign in failed. Please check your email and password.';
+            errEl.textContent = err.message || (window.i18n && i18n.t('authInvalid')) || 'Sign in failed.';
             errEl.classList.add('visible');
             passEl.value = '';
         } finally {

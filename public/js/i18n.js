@@ -133,6 +133,35 @@
       // Language
       langEn: 'English',
       langFr: 'Français',
+
+      // Auth / login
+      authWelcome: 'Welcome!',
+      authSubtitle: 'Sign in by entering the information below',
+      authEmail: 'Email Address',
+      authPassword: 'Password',
+      authRemember: 'Remember Me',
+      authContinue: 'Continue',
+      authTagline: 'Donation Coordination Network',
+      authErrEmail: 'Please enter a valid email address.',
+      authErrPassword: 'Please enter your password.',
+      authInvalid: 'Invalid email or password. Please try again.',
+      emailPlaceholder: 'email@example.com',
+
+      // Staff portal nav
+      'nav.dashboard': 'Dashboard',
+      'nav.inventory': 'Inventory',
+      'nav.your_needs': 'Your Needs',
+      'nav.other_needs': 'Other Needs',
+      'nav.donations': 'Donations',
+      'nav.surplus': 'Surplus',
+      'nav.transfers': 'Transfers',
+      'nav.chats': 'Chat',
+      'nav.analytics': 'Analytics',
+      'nav.sign_out': 'Sign out',
+      'coord.organizations': 'Organizations',
+      'coord.staff': 'Staff',
+      'coord.all_needs': 'All Needs',
+      'coord.transfers': 'Transfers',
     },
     fr: {
       // Nav
@@ -260,6 +289,33 @@
 
       langEn: 'English',
       langFr: 'Français',
+
+      authWelcome: 'Bienvenue!',
+      authSubtitle: 'Connectez-vous en saisissant vos informations ci-dessous',
+      authEmail: 'Adresse courriel',
+      authPassword: 'Mot de passe',
+      authRemember: 'Se souvenir de moi',
+      authContinue: 'Continuer',
+      authTagline: 'Réseau de coordination des dons',
+      authErrEmail: 'Veuillez entrer une adresse courriel valide.',
+      authErrPassword: 'Veuillez entrer votre mot de passe.',
+      authInvalid: 'Courriel ou mot de passe invalide. Veuillez réessayer.',
+      emailPlaceholder: 'courriel@exemple.com',
+
+      'nav.dashboard': 'Tableau de bord',
+      'nav.inventory': 'Inventaire',
+      'nav.your_needs': 'Vos besoins',
+      'nav.other_needs': 'Autres besoins',
+      'nav.donations': 'Dons',
+      'nav.surplus': 'Surplus',
+      'nav.transfers': 'Transferts',
+      'nav.chats': 'Discussions',
+      'nav.analytics': 'Analytique',
+      'nav.sign_out': 'Déconnexion',
+      'coord.organizations': 'Organismes',
+      'coord.staff': 'Personnel',
+      'coord.all_needs': 'Tous les besoins',
+      'coord.transfers': 'Transferts',
     },
   };
 
@@ -276,6 +332,7 @@
   function setLocale(locale) {
     try {
       localStorage.setItem(LOCALE_KEY, locale);
+      localStorage.removeItem('cg-locale');
     } catch {}
   }
 
@@ -311,7 +368,10 @@
     switchLocale: function () {
       currentLocale = currentLocale === 'fr' ? 'en' : 'fr';
       setLocale(currentLocale);
-      window.location.reload();
+      applyTranslations();
+      if (window.CGPrefs && typeof window.CGPrefs.updateLocaleButton === 'function') {
+        window.CGPrefs.updateLocaleButton();
+      }
     },
     CAT_LABELS: function () {
       return {

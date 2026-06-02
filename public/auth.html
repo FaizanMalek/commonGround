@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign In — CommonGround</title>
+  <script src="/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/css/theme.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -48,6 +50,7 @@
       width: 100%;
       padding: 3rem 2rem;
       background: var(--surface);
+      position: relative;
     }
     @media (min-width: 768px) {
       .auth-form-panel { width: 50%; }
@@ -290,12 +293,13 @@
     }
   </style>
 </head>
-<body>
+<body class="auth-page">
 
 <div class="auth-split">
 
   <!-- Left: Form -->
   <div class="auth-form-panel">
+    <div class="auth-prefs" id="auth-prefs-mount"></div>
     <div class="auth-inner">
 
       <div class="auth-logo-row">
@@ -304,8 +308,8 @@
       </div>
 
       <div class="auth-heading">
-        <h1>Welcome!</h1>
-        <p>Sign in by entering the information below</p>
+        <h1 data-i18n="authWelcome">Welcome!</h1>
+        <p data-i18n="authSubtitle">Sign in by entering the information below</p>
       </div>
 
       <div id="auth-error" class="auth-error"></div>
@@ -313,14 +317,14 @@
       <form id="login-form" class="auth-form" onsubmit="handleLogin(event)" novalidate>
 
         <div class="field-group">
-          <label class="field-label" for="email">Email Address</label>
+          <label class="field-label" for="email" data-i18n="authEmail">Email Address</label>
           <input type="email" id="email" class="field-input"
-                 autocomplete="email" placeholder="email@example.com" autofocus>
-          <span class="field-error" id="err-email">Please enter a valid email address.</span>
+                 autocomplete="email" data-i18n-placeholder="emailPlaceholder" placeholder="email@example.com" autofocus>
+          <span class="field-error" id="err-email" data-i18n="authErrEmail">Please enter a valid email address.</span>
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="password">Password</label>
+          <label class="field-label" for="password" data-i18n="authPassword">Password</label>
           <div class="field-password-wrap">
             <input type="password" id="password" class="field-input field-input-pw"
                    autocomplete="current-password" placeholder="••••••••••••">
@@ -331,17 +335,17 @@
               </svg>
             </button>
           </div>
-          <span class="field-error" id="err-password">Please enter your password.</span>
+          <span class="field-error" id="err-password" data-i18n="authErrPassword">Please enter your password.</span>
         </div>
 
         <label class="auth-remember">
           <input type="checkbox" id="remember-me">
-          Remember Me
+          <span data-i18n="authRemember">Remember Me</span>
         </label>
 
         <button type="submit" class="auth-btn" id="btn-login">
           <span class="spinner"></span>
-          <span class="btn-text">Continue</span>
+          <span class="btn-text" data-i18n="authContinue">Continue</span>
         </button>
 
       </form>
@@ -354,15 +358,20 @@
     <div class="auth-brand-content">
       <img src="/assets/images/logo.png" alt="CommonGround" class="auth-brand-logo">
       <span class="auth-brand-name">CommonGround</span>
-      <p class="auth-brand-tagline">Donation Coordination Network</p>
+      <p class="auth-brand-tagline" data-i18n="authTagline">Donation Coordination Network</p>
     </div>
   </div>
 
 </div>
 
+<script src="/js/i18n.js"></script>
+<script src="/js/site-prefs.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
 <script>
+  document.getElementById('auth-prefs-mount').innerHTML = CGPrefs.toolbarHtml();
+  CGPrefs.init();
+
   function showError(msg) {
     const el = document.getElementById('auth-error');
     el.textContent = msg;
@@ -413,7 +422,7 @@
         window.location.href = (res.data && res.data.isAdmin) ? '/coordinator' : '/staff';
       }
     } catch (err) {
-      showError(err.message || 'Invalid email or password. Please try again.');
+      showError(err.message || (window.i18n && i18n.t('authInvalid')) || 'Invalid email or password. Please try again.');
       passEl.value = '';
       btn.disabled = false;
       btn.classList.remove('loading');

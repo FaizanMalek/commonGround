@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate — CommonGround</title>
+    <script src="/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/css/theme.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -91,8 +93,14 @@
                     <a href="/" data-i18n="navNeedsBoard">Needs Board</a>
                     <a href="/give" class="active" data-i18n="navDonate">Donate</a>
                 </div>
-                <div class="nav-actions">
-                    <button type="button" class="btn btn-ghost btn-sm" onclick="i18n.switchLocale()" title="EN / FR" style="margin-right:.5rem">EN / FR</button>
+                <div class="nav-actions" style="display:flex;align-items:center;gap:.5rem;">
+                    <div class="cg-prefs" role="group" aria-label="Display preferences">
+                        <button type="button" class="cg-pref-btn" id="cg-locale-btn" title="Language">FR</button>
+                        <button type="button" class="cg-pref-btn cg-theme-btn" id="cg-theme-btn" title="Toggle theme" aria-label="Toggle theme">
+                            <span class="cg-icon-moon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+                            <span class="cg-icon-sun" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="5"/></svg></span>
+                        </button>
+                    </div>
                     <a href="/login" class="btn btn-ghost btn-sm" data-i18n="navStaffLogin">Staff login</a>
                 </div>
             </div>
@@ -230,9 +238,11 @@
     </div>
 </div>
 
+<script src="/js/site-prefs.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
 <script>
+    CGPrefs.init();
     i18n.apply();
 
     let allOrgs = [];
