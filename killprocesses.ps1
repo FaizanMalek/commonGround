@@ -1,36 +1,32 @@
-# Port to kill
-$port = 3000
+# Free the dev server port
+$ports = @(3000)
 
-Write-Host "Scanning for processes using port $port ..."
+foreach ($port in $ports) {
+    Write-Host "Scanning for processes using port $port ..."
 
-# Find all lines with this port
-$lines = netstat -ano | findstr ":$port"
+    $lines = netstat -ano | findstr ":$port "
 
-if (!$lines) {
-    Write-Host "No processes found on port $port."
-    exit
-}
+    if (!$lines) {
+        Write-Host "  No processes on port $port."
+        continue
+    }
 
-# Extract PIDs safely
-$procIds = @()
+    $procIds = @()
+    foreach ($line in $lines) {
+        $parts = $line -split "\s+"
+        $id = $parts[-1]
+        if ($id -match '^\d+$') {
+            $procIds += $id
+        }
+    }
 
-foreach ($line in $lines) {
-    $parts = $line -split "\s+"
-    $id = $parts[-1]
+    $procIds = $procIds | Select-Object -Unique
+    Write-Host "  Found PIDs: $($procIds -join ', ')"
 
-    if ($id -match '^\d+$') {
-        $procIds += $id
+    foreach ($procId in $procIds) {
+        Write-Host "  Killing PID $procId"
+        taskkill /PID $procId /F 2>$null | Out-Null
     }
 }
 
-$procIds = $procIds | Select-Object -Unique
-
-Write-Host "Found PIDs: $($procIds -join ', ')"
-Write-Host "Killing all..."
-
-foreach ($procId in $procIds) {
-    Write-Host "Killing PID $procId"
-    taskkill /PID $procId /F | Out-Null
-}
-
-Write-Host "All processes on port $port have been terminated."
+Write-Host "Done. Run: npm run dev"

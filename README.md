@@ -66,7 +66,7 @@ All AI-generated code was reviewed, tested, and modified by the team before use.
 | Matching | Rule-based weighted scoring (no external API) |
 | Auth | JWT (access + refresh tokens, httpOnly cookies) |
 
-No build tools, no framework dependencies. Runs with `npm run dev`.
+Single Node process: Express serves the UI from `public/` and the API from `/api`. No frontend build step.
 
 ---
 
@@ -74,48 +74,82 @@ No build tools, no framework dependencies. Runs with `npm run dev`.
 
 ### Prerequisites
 
-- Node.js 18+
-- MySQL server running locally (or remote)
-- A MySQL user with access to create databases (see `create db.txt`)
+- **Node.js 18+**
+- **MySQL** running locally (or a remote instance with SSL configured in `.env`)
 
-### 1. Install dependencies
+### 1. Clone and install
 
 ```bash
+git clone https://github.com/FaizanMalek/commonGround.git
+cd commonGround
 npm install
 ```
 
-### 2. Configure environment
+**Windows (PowerShell)** — same folder after clone:
 
-Copy `.env.example` to `.env` and fill in your values:
+```powershell
+npm install
+```
+
+### 2. Environment
+
+Copy the example file and set your database credentials:
 
 ```bash
 cp .env.example .env
 ```
 
-The only values you must change to run locally are the database credentials (which default to the hackathon dev values).
+Windows:
 
-### 3. Create the database and seed data
-
-**Option A — Fresh schema (empty tables):**
-```bash
-npm run migrate
+```powershell
+copy .env.example .env
 ```
 
-**Option B — Demo data (10 real Moncton NB orgs, inventory, needs, donations):**
+Edit `.env` — at minimum set `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` to match your MySQL setup. Local defaults are in `.env.example` (`DB_USER=hackathon`, `DB_NAME=CommonGround`, etc.).
+
+Set `ADMIN_DEFAULT_PASSWORD` to the coordinator password you want; `npm run migrate` creates the coordinator account using `ADMIN_DEFAULT_EMAIL` and this password.
+
+### 3. Database
+
+**First-time setup (schema + seed data from migrate script):**
+
+```bash
+npm run setup
+```
+
+This runs `npm install` and `npm run migrate`. **Warning:** `migrate` drops and recreates all tables — do not run it on a production database with data you need to keep.
+
+**Optional — full Moncton demo dataset** (10 real orgs, inventory, needs, donations):
+
 ```bash
 npm run migrate
 npm run seed:demo
 ```
 
-This loads `seed-demo.sql`: 10 real organizations (House of Nazareth, Harvest House, Crossroads for Women, YWCA, John Howard Society, Peter McKee Food Centre, Second Mile Food Bank, Salvation Army, St. Vincent de Paul, The Humanity Project), staff accounts, inventory, needs, donations, and surplus transfers — ready for demo.
+`seed:demo` loads `seed-demo.sql` after migrate.
 
-### 4. Start the development server
+### 4. Run the app
 
 ```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000`
+Open **http://localhost:3000**
+
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Development server with auto-restart (nodemon) |
+| `npm start` | Production-style start (no file watching) |
+| `npm run migrate` | Reset DB schema + seed (destructive) |
+| `npm run seed:demo` | Load demo SQL after migrate |
+| `npm test` | Run Jest tests |
+
+### Troubleshooting
+
+- **`Port 3000 is already in use`** — another copy of the app is still running. Windows: `.\killprocesses.ps1` then `npm run dev` again.
+- **Database connection failed** — check MySQL is running and `.env` credentials match. For cloud DBs set `DB_SSL_ENABLED=true` and `DB_CA_CERT_PATH` if required.
+- **Health check** — `http://localhost:3000/api/health?deep=true` should return `"db":"ok"`.
+- **Wrong UI** — use port **3000** only. The app UI lives in `public/`; there is no separate Vite/React dev server.
 
 ---
 
@@ -140,12 +174,15 @@ Visit `http://localhost:3000`
 
 ## Default Login Credentials
 
-After running `npm run migrate` and `npm run seed:demo`:
-### 🔑 Test Accounts
+After `npm run migrate` (and optionally `npm run seed:demo`):
+
+**Coordinator password** = value of `ADMIN_DEFAULT_PASSWORD` in your `.env` (default in `.env.example` is `password123`).
+
+### Test accounts
 
 | Role | Email | Password |
 |-----|-----|-----|
-| Coordinator | coordinator@commonground.ca | password123 |
+| Coordinator | coordinator@commonground.ca | *(your `ADMIN_DEFAULT_PASSWORD`)* |
 | Staff – House of Nazareth | info@maisonnazareth.ca | password123 |
 | Staff – Harvest House | info@harvesthouseatlantic.org | password123 |
 | Staff – Crossroads for Women | adminfo@crossroadsforwomen.ca | password123 |
@@ -246,48 +283,29 @@ Donation matching and network insights use **automatic rule-based logic** — no
 ## Project Structure
 
 ```
-Hackaton-hack4change/
-├── backend/
-│   ├── config/
-│   │   └── database.js          # MySQL connection pool
+commonGround/
+├── backend/                 # API, auth, models, Socket.IO
+│   ├── config/database.js
 │   ├── controllers/
-│   │   └── auth.controller.js   # Login, logout, me, refresh
 │   ├── middleware/
-│   │   ├── auth.middleware.js   # JWT verification
-│   │   └── security.middleware.js
 │   ├── models/
-│   │   ├── admin.model.js
-│   │   ├── staff.model.js
-│   │   ├── organization.model.js
-│   │   ├── inventory.model.js
-│   │   ├── needs.model.js
-│   │   └── donation.model.js
 │   ├── routes/
-│   │   ├── auth.routes.js
-│   │   ├── public.routes.js
-│   │   ├── staff.routes.js
-│   │   ├── coordinator.routes.js
-│   │   └── ai.routes.js
 │   ├── utils/
-│   │   ├── jwt.util.js
-│   │   └── hash.util.js
-│   └── server.js
-├── public/
-│   ├── index.html               # Public needs board
-│   ├── give.html                 # Donation landing page
-│   ├── donate.html               # Donation form with automatic matching
-│   ├── all-needs.html            # Paginated needs list
-│   ├── auth.html                 # Login page
-│   ├── staff.html                # Staff portal
-│   ├── coordinator.html         # Coordinator dashboard
-│   ├── css/style.css
-│   └── js/
-│       ├── api.js                # API client
-│       └── utils.js              # Toast, badge helpers, auth guard
+│   └── server.js            # Express app entry point
+├── public/                  # Frontend (HTML, CSS, JS) — served at http://localhost:3000
+│   ├── index.html           # Needs board
+│   ├── donate.html, give.html, all-needs.html
+│   ├── auth.html            # Login (/login)
+│   ├── staff.html, coordinator.html
+│   ├── css/
+│   └── js/                  # api.js, utils.js, i18n.js
 ├── scripts/
-│   ├── migrate.js               # Schema creation
-│   └── run-seed-demo.js         # Load demo data (10 real orgs, inventory, needs, donations)
-├── .env                          # Environment configuration
+│   ├── migrate.js           # DB schema (destructive reset)
+│   ├── run-seed-demo.js
+│   └── backup.js
+├── tests/
+├── .env.example               # Copy to .env (never commit .env)
+├── killprocesses.ps1          # Free port 3000 on Windows
 ├── package.json
 └── README.md
 ```
