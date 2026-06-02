@@ -161,6 +161,16 @@ const start = async () => {
         console.log(`CommonGround running at http://localhost:${PORT}`);
     });
 
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.error(`\nPort ${PORT} is already in use. Stop the other process or run:`);
+            console.error('  .\\killprocesses.ps1   (Windows)');
+            console.error(`  Then: npm run dev\n`);
+            process.exit(1);
+        }
+        throw err;
+    });
+
     const shutdown = async (signal) => {
         logger.info(`Received ${signal}, shutting down gracefully`);
         server.close(async () => {

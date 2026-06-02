@@ -4,16 +4,14 @@
   "description": "CommonGround - Community app for homelessness support",
   "main": "backend/server.js",
   "scripts": {
-    "dev": "concurrently -n backend,frontend \"nodemon --delay 500ms backend/server.js\" \"cd frontend && npm run dev\"",
-    "dev:backend": "nodemon --delay 500ms backend/server.js",
+    "setup": "npm install && npm run migrate",
+    "dev": "nodemon --delay 500ms backend/server.js",
     "start": "node backend/server.js",
     "migrate": "node scripts/migrate.js",
     "seed:demo": "node scripts/run-seed-demo.js",
     "backup": "node scripts/backup.js",
     "test": "jest --forceExit --detectOpenHandles",
-    "test:verbose": "jest --forceExit --detectOpenHandles --verbose",
-    "build:login": "cd frontend && npm run build",
-    "dev:login": "cd frontend && npm run dev"
+    "test:verbose": "jest --forceExit --detectOpenHandles --verbose"
   },
   "keywords": [
     "homelessness",
@@ -41,7 +39,6 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1",
     "jest": "^30.3.0",
     "nodemon": "^3.1.11",
     "supertest": "^7.2.2"

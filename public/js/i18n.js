@@ -1,6 +1,6 @@
 /**
  * CommonGround — Bilingual (EN/FR) support for public HTML pages
- * Uses same localStorage key as React frontend: commonground-locale
+ * Locale key in localStorage: commonground-locale
  */
 (function () {
   const LOCALE_KEY = 'commonground-locale';
