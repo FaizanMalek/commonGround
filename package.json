@@ -4,7 +4,7 @@
   "description": "CommonGround - Community app for homelessness support",
   "main": "backend/server.js",
   "scripts": {
-    "setup": "npm install && npm run migrate",
+    "setup": "npm install && npm run migrate && npm run seed:demo",
     "dev": "nodemon --delay 500ms backend/server.js",
     "start": "node backend/server.js",
     "migrate": "node scripts/migrate.js",

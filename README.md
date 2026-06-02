@@ -107,26 +107,26 @@ copy .env.example .env
 
 Edit `.env` — at minimum set `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` to match your MySQL setup. Local defaults are in `.env.example` (`DB_USER=hackathon`, `DB_NAME=CommonGround`, etc.).
 
-Set `ADMIN_DEFAULT_PASSWORD` to the coordinator password you want; `npm run migrate` creates the coordinator account using `ADMIN_DEFAULT_EMAIL` and this password.
+Keep `ADMIN_DEFAULT_PASSWORD=password123` in `.env` unless you choose a different coordinator password before running `migrate` alone (without `seed:demo`).
 
 ### 3. Database
 
-**First-time setup (schema + seed data from migrate script):**
+**Recommended first-time setup** (schema + Moncton demo data + login accounts below):
 
 ```bash
 npm run setup
 ```
 
-This runs `npm install` and `npm run migrate`. **Warning:** `migrate` drops and recreates all tables — do not run it on a production database with data you need to keep.
+This runs `npm install`, `npm run migrate`, and `npm run seed:demo`.
 
-**Optional — full Moncton demo dataset** (10 real orgs, inventory, needs, donations):
+**Warning:** `migrate` drops and recreates all tables. `seed:demo` clears and reloads demo data. Do not run these on a production database with data you need to keep.
+
+**Manual steps** (same result):
 
 ```bash
 npm run migrate
 npm run seed:demo
 ```
-
-`seed:demo` loads `seed-demo.sql` after migrate.
 
 ### 4. Run the app
 
@@ -174,15 +174,13 @@ Open **http://localhost:3000**
 
 ## Default Login Credentials
 
-After `npm run migrate` (and optionally `npm run seed:demo`):
-
-**Coordinator password** = value of `ADMIN_DEFAULT_PASSWORD` in your `.env` (default in `.env.example` is `password123`).
+After `npm run setup` or `npm run seed:demo`, **all accounts use `password123`**:
 
 ### Test accounts
 
 | Role | Email | Password |
 |-----|-----|-----|
-| Coordinator | coordinator@commonground.ca | *(your `ADMIN_DEFAULT_PASSWORD`)* |
+| Coordinator | coordinator@commonground.ca | password123 |
 | Staff – House of Nazareth | info@maisonnazareth.ca | password123 |
 | Staff – Harvest House | info@harvesthouseatlantic.org | password123 |
 | Staff – Crossroads for Women | adminfo@crossroadsforwomen.ca | password123 |
