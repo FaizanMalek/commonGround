@@ -221,7 +221,7 @@ const run = async () => {
         const { randomUUID } = require('crypto');
 
         const adminEmail = process.env.ADMIN_DEFAULT_EMAIL || 'coordinator@commonground.ca';
-        const adminPass = process.env.ADMIN_DEFAULT_PASSWORD || 'Admin123456';
+        const adminPass = process.env.ADMIN_DEFAULT_PASSWORD || 'password123';
         const adminHash = await bcrypt.hash(adminPass, 10);
         await conn.query(
             `INSERT INTO admins (id, first_name, last_name, email, password_hash, role) VALUES (?, ?, ?, ?, ?, ?)`,
