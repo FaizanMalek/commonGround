@@ -131,3 +131,10 @@ Create a one-off job in Render that runs `npm run migrate` with the same env var
 **Cookies not persisting**
 - Set `COOKIE_SECURE=true` for HTTPS
 - Ensure `CORS_ORIGINS` includes the exact frontend origin and `credentials: true` is used
+
+**"Internal server error" on login**
+1. In Render **Logs**, look for `Login error:` or `ValidationError` / `X-Forwarded-For` (fixed in latest code via `trust proxy`).
+2. Run **`npm run migrate`** and **`npm run seed:demo`** in Render Shell if the DB is empty.
+3. Use the password that matches production: **`ADMIN_DEFAULT_PASSWORD`** from Render env (migrate uses this), or demo **`password123`** after `seed:demo`.
+4. Confirm **`JWT_SECRET`** is set (Blueprint auto-generates it).
+5. Set **`CORS_ORIGINS`** to your exact Render URL, e.g. `https://commonground-xxxx.onrender.com` (no trailing slash).

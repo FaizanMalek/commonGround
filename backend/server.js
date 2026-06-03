@@ -20,6 +20,9 @@ const aiRoutes = require('./routes/ai.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Required on Render/Heroku etc. — express-rate-limit uses X-Forwarded-For
+app.set('trust proxy', 1);
+
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -130,6 +133,11 @@ const start = async () => {
     const ok = await testConnection();
     if (!ok) {
         logger.error('Database connection failed. Run: npm run migrate');
+        process.exit(1);
+    }
+
+    if (!process.env.JWT_SECRET) {
+        logger.error('JWT_SECRET is not set — login will fail');
         process.exit(1);
     }
 
