@@ -125,8 +125,10 @@ Create a one-off job in Render that runs `npm run migrate` with the same env var
 - Set `DB_SSL_ENABLED=true`
 - If needed, add Aiven’s CA cert to `DB_CA_CERT`
 
-**CORS errors**
-- Add your Render URL to `CORS_ORIGINS` (e.g. `https://commonground-xxx.onrender.com`)
+**CORS errors (`Not allowed by CORS` in logs)**
+- Set **`CORS_ORIGINS`** to your exact Render URL, e.g. `https://commonground-xxxx.onrender.com` (no trailing slash).
+- Render also sets **`RENDER_EXTERNAL_URL`** automatically; recent app versions allow that without manual CORS setup.
+- Wrong URL (http vs https, typo, extra `/`) causes login/API to fail.
 
 **Cookies not persisting**
 - Set `COOKIE_SECURE=true` for HTTPS

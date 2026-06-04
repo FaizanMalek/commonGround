@@ -39,15 +39,24 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
-const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
+const normalizeOrigin = (url) => (url || '').trim().replace(/\/$/, '');
+
+const allowedOrigins = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean);
+if (process.env.RENDER_EXTERNAL_URL) {
+    allowedOrigins.push(normalizeOrigin(process.env.RENDER_EXTERNAL_URL));
+}
 allowedOrigins.push(`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`);
 
 app.use(cors({
     origin: (origin, cb) => {
         if (!origin) return cb(null, true);
-        if (allowedOrigins.includes(origin)) return cb(null, true);
+        if (allowedOrigins.includes(normalizeOrigin(origin))) return cb(null, true);
         if (process.env.NODE_ENV === 'development') return cb(null, true);
-        cb(new Error('Not allowed by CORS'));
+        logger.warn('CORS blocked origin', { origin, allowed: allowedOrigins });
+        cb(null, false);
     },
     credentials: true
 }));
