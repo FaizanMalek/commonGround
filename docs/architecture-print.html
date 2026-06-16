@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CommonGround — System Architecture</title>
+  <style>
+    @page { margin: 18mm 16mm; size: A4; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.45;
+      color: #1a1a1a;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    h1 { font-size: 22pt; color: #0d3b4c; margin: 0 0 6px; border-bottom: 3px solid #2a9d8f; padding-bottom: 8px; }
+    h2 { font-size: 14pt; color: #0d3b4c; margin: 22px 0 8px; page-break-after: avoid; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    h3 { font-size: 11pt; color: #264653; margin: 14px 0 6px; page-break-after: avoid; }
+    p { margin: 6px 0; }
+    .meta { color: #555; font-size: 9.5pt; margin-bottom: 18px; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 9.5pt; page-break-inside: avoid; }
+    th, td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; vertical-align: top; }
+    th { background: #e8f4f2; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafafa; }
+    pre, code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 8.5pt;
+      background: #f4f4f4;
+    }
+    pre {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      page-break-inside: avoid;
+    }
+    ul, ol { margin: 6px 0 10px; padding-left: 22px; }
+    li { margin: 3px 0; }
+    .toc { background: #f0f7f6; border: 1px solid #b8d4cf; padding: 12px 16px; margin: 16px 0; border-radius: 6px; }
+    .toc ol { margin: 0; }
+    .page-break { page-break-before: always; }
+    footer { margin-top: 24px; padding-top: 8px; border-top: 1px solid #ccc; font-size: 9pt; color: #666; text-align: center; }
+  </style>
+</head>
+<body>
+
+<h1>CommonGround — System Architecture</h1>
+<p class="meta"><strong>Version 1.0</strong> · Hack4Change 2026 · GMHSC Donation Coordination Platform · June 2026</p>
+
+<div class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li>Executive Summary</li>
+    <li>High-Level Architecture</li>
+    <li>Technology Stack</li>
+    <li>Project Structure</li>
+    <li>User Roles &amp; Entry Points</li>
+    <li>Backend Architecture</li>
+    <li>Frontend Architecture</li>
+    <li>API Surface</li>
+    <li>Authentication &amp; Security</li>
+    <li>Real-Time Layer</li>
+    <li>Donation Matching Engine</li>
+    <li>Database Overview</li>
+    <li>How Items Are Stored</li>
+    <li>Domain Workflows</li>
+    <li>Deployment &amp; Operations</li>
+    <li>Testing &amp; Scripts</li>
+  </ol>
+</div>
+
+<h2>1. Executive Summary</h2>
+<p><strong>CommonGround</strong> is a real-time donation coordination platform for the Greater Moncton Homelessness Steering Committee (GMHSC) network of 28 homeless-serving organizations. It connects donors, shelter staff, and network coordinators in a single web application.</p>
+<ul>
+  <li><strong>Donors</strong> — Browse live needs and submit donations without an account.</li>
+  <li><strong>Shelter staff</strong> — Manage inventory, post shortages, confirm donations, request surplus, chat.</li>
+  <li><strong>Coordinators</strong> — Network-wide KPIs, org/staff management, transfers, exports.</li>
+</ul>
+<p>The app runs as a <strong>monolithic Node.js process</strong>: Express serves static HTML/JS from <code>public/</code> and REST API under <code>/api</code>, backed by <strong>MySQL</strong>, with <strong>Socket.IO</strong> for live updates. No frontend build step, no microservices, no ORM.</p>
+
+<h2>2. High-Level Architecture</h2>
+<pre>
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              CLIENTS                                     │
+│  Donor (public)          Staff (/staff)           Coordinator          │
+└────────────┬────────────────────┬────────────────────┬──────────────────┘
+             │ HTTP              │ HTTP + Socket.IO   │ HTTP + Socket.IO
+             ▼                    ▼                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Node.js — backend/server.js                           │
+│  Express Static (public/) │ Middleware │ REST /api/* │ Socket.IO        │
+└────────────────────────────┬────────────────────┬───────────────────────┘
+                             ▼                    ▼
+                    ┌────────────────┐    ┌────────────────┐
+                    │     MySQL      │    │   Nodemailer   │
+                    └────────────────┘    └────────────────┘
+</pre>
+
+<h2>3. Technology Stack</h2>
+<table>
+  <tr><th>Layer</th><th>Technology</th></tr>
+  <tr><td>Frontend</td><td>HTML5, CSS3, vanilla JavaScript (no bundler)</td></tr>
+  <tr><td>Backend</td><td>Node.js 18+, Express.js</td></tr>
+  <tr><td>Database</td><td>MySQL via mysql2 connection pool</td></tr>
+  <tr><td>Real-time</td><td>Socket.IO 4.x</td></tr>
+  <tr><td>Auth</td><td>JWT (access + refresh) in httpOnly cookies</td></tr>
+  <tr><td>Email</td><td>Nodemailer</td></tr>
+  <tr><td>Matching</td><td>Rule-based scoring (no external AI API)</td></tr>
+  <tr><td>Security</td><td>Helmet, rate-limit, express-validator, bcryptjs</td></tr>
+  <tr><td>Tests</td><td>Jest + Supertest</td></tr>
+  <tr><td>Deploy</td><td>Render + Aiven MySQL (SSL)</td></tr>
+</table>
+
+<h2>4. Project Structure</h2>
+<pre>
+commonGround/
+├── backend/
+│   ├── server.js              # Express + Socket.IO + static routes
+│   ├── config/database.js     # mysql2 pool
+│   ├── controllers/           # auth.controller.js
+│   ├── middleware/            # auth, security
+│   ├── models/                # One model per table
+│   ├── routes/                # public, auth, staff, coordinator, ai
+│   └── utils/                 # email, jwt, hash, logger
+├── public/                    # Frontend HTML, CSS, JS
+├── scripts/                   # migrate.js, run-seed-demo.js
+├── tests/                     # Jest suites
+├── seed-demo.sql
+├── render.yaml
+└── package.json
+</pre>
+
+<div class="page-break"></div>
+
+<h2>5. User Roles &amp; Entry Points</h2>
+<table>
+  <tr><th>User</th><th>URLs</th><th>Auth</th></tr>
+  <tr><td>Donor</td><td>/, /give, /donate, /all-needs</td><td>None</td></tr>
+  <tr><td>Staff</td><td>/login → /staff</td><td>JWT (org-scoped)</td></tr>
+  <tr><td>Coordinator</td><td>/login → /coordinator</td><td>JWT + isAdmin</td></tr>
+</table>
+
+<h3>Staff dashboard sections</h3>
+<p>Dashboard, Inventory, Your Needs, Other Needs, Donations, Analytics, Chats.</p>
+<h3>Coordinator dashboard sections</h3>
+<p>Overview, Organizations, Staff, All Needs, Donations, Inventory, Transfers, Chat, Analytics.</p>
+
+<h2>6. Backend Architecture</h2>
+<h3>Models (data access)</h3>
+<table>
+  <tr><th>Model</th><th>Table</th></tr>
+  <tr><td>organization.model.js</td><td>organizations</td></tr>
+  <tr><td>staff.model.js</td><td>staff_members</td></tr>
+  <tr><td>admin.model.js</td><td>admins</td></tr>
+  <tr><td>inventory.model.js</td><td>inventory_items</td></tr>
+  <tr><td>needs.model.js</td><td>needs</td></tr>
+  <tr><td>donation.model.js</td><td>donations</td></tr>
+  <tr><td>surplusRequest.model.js</td><td>surplus_requests</td></tr>
+  <tr><td>surplusTransfer.model.js</td><td>surplus_transfers</td></tr>
+  <tr><td>chatThread / chatMessage</td><td>chat_threads, chat_messages</td></tr>
+</table>
+
+<h3>Route authorization</h3>
+<table>
+  <tr><th>Prefix</th><th>Access</th></tr>
+  <tr><td>/api/public/*</td><td>No auth</td></tr>
+  <tr><td>/api/auth/*</td><td>Login, cookies</td></tr>
+  <tr><td>/api/staff/*</td><td>authenticateToken</td></tr>
+  <tr><td>/api/coordinator/*</td><td>authenticateToken + requireAdmin</td></tr>
+  <tr><td>/api/ai/match-donation</td><td>Public (rate-limited)</td></tr>
+  <tr><td>/api/ai/network-insights</td><td>Admin only</td></tr>
+</table>
+
+<h2>7. Frontend Architecture</h2>
+<p>Multi-page app with two large dashboard SPAs (<code>staff.html</code>, <code>coordinator.html</code>). Shared client code in <code>public/js/api.js</code> (fetch + cookies), <code>i18n.js</code> (EN/FR), theme utilities. Dashboards use sidebar section switching without full page reloads.</p>
+
+<h2>8. API Surface</h2>
+<h3>Public</h3>
+<ul>
+  <li>GET /api/public/orgs-with-needs, /needs, /organizations</li>
+  <li>POST /api/public/donations</li>
+  <li>PATCH /api/public/donations/:id/match</li>
+</ul>
+<h3>Auth</h3>
+<ul>
+  <li>POST /api/auth/login, logout, refresh</li>
+  <li>GET /api/auth/me</li>
+</ul>
+<h3>Staff (JWT)</h3>
+<ul>
+  <li>Inventory, needs, donations CRUD + confirm</li>
+  <li>Surplus requests, transfers, expiring items, chat</li>
+</ul>
+<h3>Coordinator (JWT + admin)</h3>
+<ul>
+  <li>Overview, orgs, staff, needs, donations pipeline</li>
+  <li>Surplus, transfers, analytics, CSV exports</li>
+</ul>
+<h3>Health</h3>
+<ul>
+  <li>GET /api/health — GET /api/health?deep=true (MySQL ping)</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>9. Authentication &amp; Security</h2>
+<p>Login verifies bcrypt password against <code>staff_members</code> or <code>admins</code>. JWT access + refresh tokens stored in <strong>httpOnly cookies</strong>. Coordinator tokens include <code>isAdmin: true</code>.</p>
+<table>
+  <tr><th>Control</th><th>Implementation</th></tr>
+  <tr><td>Headers</td><td>Helmet + CSP</td></tr>
+  <tr><td>CORS</td><td>CORS_ORIGINS env var</td></tr>
+  <tr><td>Rate limit</td><td>200 req / 15 min (production)</td></tr>
+  <tr><td>Input</td><td>Sanitization middleware</td></tr>
+  <tr><td>SQL</td><td>Parameterized queries + injection blocking</td></tr>
+</table>
+
+<h2>10. Real-Time Layer (Socket.IO)</h2>
+<p>Socket.IO shares the HTTP server. Events: <code>donation:new</code>, <code>need:new</code>, <code>need:fulfilled</code>, <code>chat:newMessage</code>.</p>
+
+<h2>11. Donation Matching Engine</h2>
+<p><code>POST /api/ai/match-donation</code> — rule-based, no external LLM.</p>
+<table>
+  <tr><th>Factor</th><th>Points</th></tr>
+  <tr><td>Category match</td><td>+10</td></tr>
+  <tr><td>Item name similarity</td><td>+15</td></tr>
+  <tr><td>Urgency (critical→low) × 3</td><td>up to +12</td></tr>
+  <tr><td>Quantity ≥ need</td><td>+5</td></tr>
+</table>
+<p>Returns <strong>top 3</strong> organizations from all unfulfilled needs network-wide.</p>
+
+<h2>12. Database Overview</h2>
+<pre>
+organizations ──&lt; staff_members
+organizations ──&lt; inventory_items
+organizations ──&lt; needs
+organizations ──&lt; donations (preferred_org_id, matched_org_id)
+inventory_items ──&lt; surplus_requests, surplus_transfers
+chat_threads ──&lt; chat_messages
+admins — network coordinators
+</pre>
+
+<table>
+  <tr><th>Table</th><th>Purpose</th></tr>
+  <tr><td>organizations</td><td>28 network orgs</td></tr>
+  <tr><td>staff_members</td><td>Org-scoped users</td></tr>
+  <tr><td>inventory_items</td><td>Per-org stock</td></tr>
+  <tr><td>needs</td><td>Per-org shortages</td></tr>
+  <tr><td>donations</td><td>Donor pipeline</td></tr>
+  <tr><td>surplus_requests</td><td>Staff surplus requests</td></tr>
+  <tr><td>surplus_transfers</td><td>Coordinator stock moves</td></tr>
+  <tr><td>chat_threads / chat_messages</td><td>In-app messaging</td></tr>
+</table>
+
+<p><strong>Schema:</strong> <code>npm run migrate</code> (destructive reset). <strong>Seed:</strong> <code>npm run seed:demo</code>.</p>
+
+<h2>13. How Items Are Stored</h2>
+<p><strong>No global product catalog.</strong> Items are org-owned rows with free-text <code>item_name</code> (e.g. "Shelf-Stable Milk (1L)").</p>
+<table>
+  <tr><th>Concept</th><th>Table</th><th>Uniqueness</th></tr>
+  <tr><td>Stock</td><td>inventory_items</td><td>One row per (org + name + category)</td></tr>
+  <tr><td>Shortage</td><td>needs</td><td>One open need per (org + name + category)</td></tr>
+  <tr><td>Donation</td><td>donations</td><td>Standalone until matched to one org</td></tr>
+</table>
+
+<h3>If all 28 orgs have milk</h3>
+<ul>
+  <li><strong>Inventory:</strong> 28 separate rows — independent quantity, status, expiry.</li>
+  <li><strong>Needs:</strong> Up to 28 need rows; matcher returns top 3 by score.</li>
+  <li><strong>Transfers:</strong> Reference specific <code>inventory_item_id</code>, not global "milk".</li>
+  <li><strong>Confirm donation:</strong> Updates only the matched org's inventory row.</li>
+</ul>
+
+<p><strong>Status logic:</strong> quantity &lt; target → low; quantity &gt; target → surplus; else available.</p>
+
+<div class="page-break"></div>
+
+<h2>14. Domain Workflows</h2>
+<h3>Donation lifecycle</h3>
+<pre>
+Donor submits → POST /api/public/donations (pending)
+  → confirmation email → Socket.IO donation:new
+  → POST /api/ai/match-donation → PATCH match (matched)
+  → staff confirm → inventory++ → thank-you email
+  → coordinator may set delivered
+</pre>
+
+<h3>Surplus redistribution</h3>
+<pre>
+Staff flags surplus → coordinator sees network surplus
+Staff B posts need → request surplus OR coordinator initiates transfer
+Coordinator approves → transfer tracked → receiving staff completes
+</pre>
+
+<h2>15. Deployment &amp; Operations</h2>
+<pre>
+npm install → cp .env.example .env → npm run setup → npm run dev
+Production: Render (render.yaml), npm start, /api/health
+MySQL: Aiven with DB_SSL_ENABLED=true, ca.pem
+</pre>
+
+<h2>16. Testing &amp; Scripts</h2>
+<table>
+  <tr><th>Script</th><th>Purpose</th></tr>
+  <tr><td>npm run setup</td><td>install + migrate + seed</td></tr>
+  <tr><td>npm run dev</td><td>nodemon development</td></tr>
+  <tr><td>npm start</td><td>production server</td></tr>
+  <tr><td>npm test</td><td>Jest test suites</td></tr>
+</table>
+
+<h2>Appendix: Design Principles</h2>
+<ol>
+  <li>Monolith simplicity — one process, one deploy.</li>
+  <li>Org-scoped data — inventory and needs belong to organizations.</li>
+  <li>Free-text items — flexible naming; fuzzy matching on submit.</li>
+  <li>Progressive auth — donors need no account.</li>
+  <li>Real-time dashboards via Socket.IO.</li>
+  <li>Rule-based matching — no paid AI APIs required.</li>
+</ol>
+
+<footer>CommonGround — Built for Hack4Change 2026 · GMHSC Network</footer>
+
+</body>
+</html>

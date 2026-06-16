@@ -271,7 +271,7 @@ const run = async () => {
         }
         console.log(`  ${orgs.length} organizations created`);
 
-        const staffPassword = await bcrypt.hash('Staff123456', 10);
+        const staffPassword = await bcrypt.hash(adminPass, 10);
         const staffSeeds = [
             { first: 'Margaret', last: 'Leblanc', email: 'staff@harvesthouse.ca', orgIdx: 0 },
             { first: 'Sandra', last: 'Gallant', email: 'staff@crossroadsforwomen.ca', orgIdx: 2 },
@@ -433,9 +433,10 @@ const run = async () => {
         console.log('  Surplus transfers created');
 
         console.log('\nMigration complete.');
-        console.log('  Coordinator login: ' + adminEmail + ' / ' + adminPass);
-        console.log('  Staff logins:      staff@harvesthouse.ca / Staff123456 (and others)');
-        console.log('  Visit:             http://localhost:' + (process.env.PORT || 3000) + '\n');
+        console.log('  Demo password (coordinator + migrate staff): ' + adminPass);
+        console.log('  Coordinator: ' + adminEmail);
+        console.log('  Full staff list: run npm run seed:demo — all use the same password');
+        console.log('  App: http://localhost:' + (process.env.PORT || 3000) + '\n');
 
     } catch (err) {
         console.error('Migration failed:', err.message);

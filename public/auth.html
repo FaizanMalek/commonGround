@@ -291,6 +291,64 @@
       max-width: 240px;
       line-height: 1.55;
     }
+
+    /* ── Demo credentials box ────────────────────────── */
+    .auth-demo {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      background: #faf9ff;
+    }
+    .auth-demo-title {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .65rem;
+    }
+    .auth-demo-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .1rem;
+      width: 100%;
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .5rem .65rem;
+      margin-bottom: .5rem;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: border-color .15s, background .15s;
+    }
+    .auth-demo-row:hover {
+      border-color: var(--purple);
+      background: #f5f3ff;
+    }
+    .auth-demo-role {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--purple-dark);
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .auth-demo-email {
+      font-size: .82rem;
+      color: var(--text);
+    }
+    .auth-demo-pw {
+      font-size: .78rem;
+      color: var(--text-muted);
+      margin-top: .35rem;
+    }
+    .auth-demo-pw code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: #ede9fe;
+      color: var(--purple-deep);
+      padding: .1rem .35rem;
+      border-radius: 4px;
+      font-size: .78rem;
+    }
   </style>
 </head>
 <body class="auth-page">
@@ -350,6 +408,20 @@
 
       </form>
 
+      <!-- Demo credentials for reviewers / recruiters -->
+      <div class="auth-demo">
+        <p class="auth-demo-title">Demo logins — click a card to auto-fill, then press Continue</p>
+        <button type="button" class="auth-demo-row" onclick="fillDemo('coordinator@commonground.ca')">
+          <span class="auth-demo-role">Coordinator</span>
+          <span class="auth-demo-email">coordinator@commonground.ca</span>
+        </button>
+        <button type="button" class="auth-demo-row" onclick="fillDemo('info@maisonnazareth.ca')">
+          <span class="auth-demo-role">Staff</span>
+          <span class="auth-demo-email">info@maisonnazareth.ca</span>
+        </button>
+        <p class="auth-demo-pw">Password for all demo accounts: <code>password123</code></p>
+      </div>
+
     </div>
   </div>
 
@@ -389,72 +461,4 @@
     const errPass  = document.getElementById('err-password');
 
     let valid = true;
-    const emailOk = emailEl.value.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
-    if (!emailOk) {
-      emailEl.classList.add('is-invalid');
-      errEmail.classList.add('visible');
-      valid = false;
-    } else {
-      emailEl.classList.remove('is-invalid');
-      errEmail.classList.remove('visible');
-    }
-    if (!passEl.value) {
-      passEl.classList.add('is-invalid');
-      errPass.classList.add('visible');
-      valid = false;
-    } else {
-      passEl.classList.remove('is-invalid');
-      errPass.classList.remove('visible');
-    }
-    if (!valid) return;
-
-    const btn = document.getElementById('btn-login');
-    btn.disabled = true;
-    btn.classList.add('loading');
-    hideError();
-
-    try {
-      const res = await auth.login(emailEl.value.trim(), passEl.value);
-      const next = new URLSearchParams(window.location.search).get('next');
-      if (next && next.startsWith('/')) {
-        window.location.href = next;
-      } else {
-        window.location.href = (res.data && res.data.isAdmin) ? '/coordinator' : '/staff';
-      }
-    } catch (err) {
-      showError(err.message || (window.i18n && i18n.t('authInvalid')) || 'Invalid email or password. Please try again.');
-      passEl.value = '';
-      btn.disabled = false;
-      btn.classList.remove('loading');
-    }
-  }
-
-  function togglePwVisibility() {
-    const input = document.getElementById('password');
-    const icon  = document.getElementById('pw-eye-icon');
-    const show  = input.type === 'password';
-    input.type  = show ? 'text' : 'password';
-    icon.innerHTML = show
-      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`
-      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
-  }
-
-  (async function checkSession() {
-    try {
-      const res = await auth.me();
-      if (res.data) {
-        const next = new URLSearchParams(window.location.search).get('next');
-        if (next && next.startsWith('/')) {
-          window.location.href = next;
-        } else if (res.data.isAdmin) {
-          window.location.href = '/coordinator';
-        } else {
-          window.location.href = '/staff';
-        }
-      }
-    } catch {}
-  })();
-</script>
-
-</body>
-</html>
+    const emailOk = emailEl.value.trim() && /^[^\s@]+@[^\s@]+\.[^
