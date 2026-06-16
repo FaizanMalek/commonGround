@@ -15,7 +15,10 @@
 <body>
 
 <div id="topbar">
-    <div class="topbar-brand"><a href="/" style="display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;color:inherit;cursor:pointer"><img src="/assets/images/logo.png" alt="Common Ground"><span>CommonGround</span></a></div>
+    <div class="topbar-brand">
+        <img src="/assets/images/logo.png" alt="Common Ground">
+        <span>CommonGround</span>
+    </div>
     <div class="topbar-actions">
         <span class="text-muted" id="nav-org-name">Network Coordinator</span>
         <button class="topbar-bell" title="Notifications" aria-label="Notifications">
@@ -93,27 +96,27 @@
         <!-- Dashboard section -->
         <div id="section-overview">
             <div class="metrics-row metrics-row-5" id="overview-metrics">
-                <div class="metric-card accent-primary">
+                <div class="metric-card">
                     <div class="metric-label">Organizations</div>
                     <div class="metric-value skeleton" style="height:2rem;width:50px;display:inline-block"></div>
                     <div class="metric-sub">CommonGround Network</div>
                 </div>
-                <div class="metric-card accent-accent">
+                <div class="metric-card">
                     <div class="metric-label">Active Needs</div>
                     <div class="metric-value skeleton" style="height:2rem;width:50px;display:inline-block"></div>
                     <div class="metric-sub">Unfulfilled across network</div>
                 </div>
-                <div class="metric-card accent-high">
+                <div class="metric-card">
                     <div class="metric-label">Critical</div>
                     <div class="metric-value skeleton" style="height:2rem;width:50px;display:inline-block"></div>
                     <div class="metric-sub">Require immediate action</div>
                 </div>
-                <div class="metric-card accent-primary">
+                <div class="metric-card">
                     <div class="metric-label">Pending Donations</div>
                     <div class="metric-value skeleton" style="height:2rem;width:50px;display:inline-block"></div>
                     <div class="metric-sub">Awaiting confirmation</div>
                 </div>
-                <div class="metric-card accent-high">
+                <div class="metric-card">
                     <div class="metric-label">Expiring Soon</div>
                     <div class="metric-value skeleton" style="height:2rem;width:50px;display:inline-block"></div>
                     <div class="metric-sub">Within 30 days</div>

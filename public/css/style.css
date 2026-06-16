@@ -1551,3 +1551,51 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 /* Org picker modal items */
 [data-theme="dark"] #org-chat-picker-list > div:hover { background: #0F172A !important; }
+
+/* ── Dark-mode design tokens (match dashboard.css so coordinator dark mode reads correctly) ── */
+[data-theme="dark"] {
+  --color-text:        #F1F5F9;
+  --color-text-muted:  #94A3B8;
+  --color-text-light:  #64748B;
+  --color-border:      #334155;
+  --color-border-lt:   #1E293B;
+  --color-bg:          #000000;
+  --color-bg-secondary:#0F172A;
+  --color-surface:     #0A0A0A;
+  --color-surface-alt: #0F172A;
+  --color-critical:    #EF4444;
+  --color-critical-bg: #450A0A;
+  --color-high:        #F59E0B;
+  --color-high-bg:     #451A03;
+  --color-medium:      #EAB308;
+  --color-medium-bg:   #422006;
+  --color-low:         #10B981;
+  --color-low-bg:      #022C22;
+  --color-surplus:     #3B82F6;
+  --color-surplus-bg:  #172554;
+}
+
+/* Fix: dark-mode <select> chevron tiled because a background shorthand reset background-repeat */
+[data-theme="dark"] select,
+[data-theme="dark"] select.form-control,
+[data-theme="dark"] .on-filter-select,
+[data-theme="dark"] .don-status-select,
+[data-theme="dark"] .inv-filter-select,
+[data-theme="dark"] .filters-inner select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right .75rem center !important;
+  background-size: 12px 8px !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Dark-mode accent colors (match dashboard.css dark so coordinator accents match staff) */
+[data-theme="dark"] {
+  --color-primary:    #3B82F6;
+  --color-primary-dk: #1D4ED8;
+  --color-primary-lt: #172554;
+  --color-accent:     #10B981;
+  --color-accent-lt:  #022C22;
+}
