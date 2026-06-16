@@ -83,7 +83,11 @@ class AuthController {
             });
         } catch (err) {
             console.error('Login error:', err);
-            res.status(500).json({ success: false, message: 'Login failed' });
+            const isProd = process.env.NODE_ENV === 'production';
+            let message = 'Login failed';
+            if (!process.env.JWT_SECRET) message = 'Server misconfigured: JWT_SECRET missing';
+            else if (err.message) message = isProd ? 'Login failed' : err.message;
+            res.status(500).json({ success: false, message });
         }
     }
 

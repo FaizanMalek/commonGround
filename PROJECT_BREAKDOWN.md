@@ -68,7 +68,7 @@
 
 1. **Go to `/login`**
    - Email + password
-   - Staff credentials (e.g. `staff@harvesthouse.ca` / `Staff123456`)
+   - Staff credentials use the same demo password as coordinator (`password123` by default)
    - Redirected to `/staff`
 
 ### Dashboard (Default View)

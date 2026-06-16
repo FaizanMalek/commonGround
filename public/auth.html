@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — CommonGround</title>
+  <title>Sign In | CommonGround</title>
   <script src="/js/theme-init.js"></script>
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,14 +34,14 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Layout ─────────────────────────────────────── */
+    /* Layout */
     .auth-split {
       display: flex;
       min-height: 100vh;
       width: 100%;
     }
 
-    /* ── Left — Form panel ───────────────────────────── */
+    /* Left form panel */
     .auth-form-panel {
       display: flex;
       flex-direction: column;
@@ -228,7 +228,7 @@
     .auth-btn.loading .btn-text { display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Right — Brand panel ─────────────────────────── */
+    /* Right brand panel */
     .auth-brand-panel {
       display: none;
       width: 50%;
@@ -291,6 +291,64 @@
       max-width: 240px;
       line-height: 1.55;
     }
+
+    /* Demo credentials box */
+    .auth-demo {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      background: rgba(124,58,237,.06);
+    }
+    .auth-demo-title {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .65rem;
+    }
+    .auth-demo-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .1rem;
+      width: 100%;
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .5rem .65rem;
+      margin-bottom: .5rem;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: border-color .15s, background .15s;
+    }
+    .auth-demo-row:hover {
+      border-color: var(--purple);
+      background: rgba(124,58,237,.12);
+    }
+    .auth-demo-role {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .auth-demo-email {
+      font-size: .82rem;
+      color: var(--text);
+    }
+    .auth-demo-pw {
+      font-size: .78rem;
+      color: var(--text-muted);
+      margin-top: .35rem;
+    }
+    .auth-demo-pw code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: rgba(124,58,237,.15);
+      color: var(--purple);
+      padding: .1rem .35rem;
+      border-radius: 4px;
+      font-size: .78rem;
+    }
   </style>
 </head>
 <body class="auth-page">
@@ -349,6 +407,20 @@
         </button>
 
       </form>
+
+      <!-- Demo credentials for reviewers / recruiters -->
+      <div class="auth-demo">
+        <p class="auth-demo-title">Demo logins: click a card to auto-fill, then press Continue</p>
+        <button type="button" class="auth-demo-row" onclick="fillDemo('coordinator@commonground.ca')">
+          <span class="auth-demo-role">Coordinator</span>
+          <span class="auth-demo-email">coordinator@commonground.ca</span>
+        </button>
+        <button type="button" class="auth-demo-row" onclick="fillDemo('info@maisonnazareth.ca')">
+          <span class="auth-demo-role">Staff</span>
+          <span class="auth-demo-email">info@maisonnazareth.ca</span>
+        </button>
+        <p class="auth-demo-pw">Password for all demo accounts: <code>password123</code></p>
+      </div>
 
     </div>
   </div>
@@ -427,6 +499,17 @@
       btn.disabled = false;
       btn.classList.remove('loading');
     }
+  }
+
+  function fillDemo(email) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = 'password123';
+    document.getElementById('email').classList.remove('is-invalid');
+    document.getElementById('password').classList.remove('is-invalid');
+    document.getElementById('err-email').classList.remove('visible');
+    document.getElementById('err-password').classList.remove('visible');
+    hideError();
+    document.getElementById('btn-login').focus();
   }
 
   function togglePwVisibility() {

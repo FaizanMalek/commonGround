@@ -209,3 +209,76 @@ html[data-theme='dark'] .give-content .site-nav .nav-brand span,
 html[data-theme='dark'] .give-content .site-nav .nav-links a {
   color: #e2e8f0;
 }
+
+/* ── Auth demo credentials card (dark) ── */
+html[data-theme='dark'] .auth-demo {
+  background: #0f172a;
+  border-color: #334155;
+}
+html[data-theme='dark'] .auth-demo-title {
+  color: #f1f5f9;
+}
+html[data-theme='dark'] .auth-demo-row {
+  background: #1e293b;
+  border-color: #334155;
+}
+html[data-theme='dark'] .auth-demo-row:hover {
+  background: #312e81;
+  border-color: #7c3aed;
+}
+html[data-theme='dark'] .auth-demo-role {
+  color: #a5b4fc;
+}
+html[data-theme='dark'] .auth-demo-email {
+  color: #f1f5f9;
+}
+html[data-theme='dark'] .auth-demo-pw {
+  color: #94a3b8;
+}
+html[data-theme='dark'] .auth-demo-pw code {
+  background: #312e81;
+  color: #c7d2fe;
+}
+
+/* ── Public landing page: dark-mode text fixes (org rows) ── */
+html[data-theme='dark'] .public-page .org-row-name { color: #F1F5F9; }
+html[data-theme='dark'] .public-page .org-row-meta { color: #94A3B8; }
+html[data-theme='dark'] .public-page .org-row-needs,
+html[data-theme='dark'] .public-page .need-row,
+html[data-theme='dark'] .public-page .need-name,
+html[data-theme='dark'] .public-page .need-item { color: #E2E8F0; }
+html[data-theme='dark'] .public-page .results-count { color: #94A3B8; }
+
+/* ── Public landing nav + org-card internals (dark) ── */
+html[data-theme='dark'] .public-page .site-nav { background: #0a0a0a !important; border-bottom-color: #1e293b !important; box-shadow: none !important; }
+html[data-theme='dark'] .public-page .nav-brand span { color: #f1f5f9 !important; }
+html[data-theme='dark'] .public-page .nav-actions a,
+html[data-theme='dark'] .public-page .nav-links a { color: #e2e8f0 !important; }
+html[data-theme='dark'] .public-page .org-row:hover { border-color: #334155; box-shadow: none; }
+html[data-theme='dark'] .public-page .org-row-header:hover,
+html[data-theme='dark'] .public-page .org-row.open .org-row-header { background: #0f172a; }
+html[data-theme='dark'] .public-page .org-row-needs { background: #050505; border-top-color: #1e293b; }
+html[data-theme='dark'] .public-page .need-row { border-bottom-color: #1e293b; }
+html[data-theme='dark'] .public-page .need-row-name { color: #f1f5f9; }
+html[data-theme='dark'] .public-page .need-row-qty { color: #cbd5e1; }
+html[data-theme='dark'] .public-page .need-row-notes { color: #94a3b8; }
+
+/* ── Give / Donate landing text (dark) ── */
+html[data-theme='dark'] .give-heading,
+html[data-theme='dark'] .donate-heading { color: #f1f5f9 !important; }
+html[data-theme='dark'] .give-subtext,
+html[data-theme='dark'] .donate-subtext { color: #cbd5e1 !important; }
+
+/* ── Donate / Give: nav Staff login + inner form panel (dark) ── */
+html[data-theme='dark'] .give-content .site-nav .nav-actions a,
+html[data-theme='dark'] .donate-content .site-nav .nav-actions a { color: #e2e8f0 !important; }
+html[data-theme='dark'] .give-content .site-nav .btn-ghost,
+html[data-theme='dark'] .donate-content .site-nav .btn-ghost { border-color: #334155 !important; color: #e2e8f0 !important; }
+html[data-theme='dark'] .donate-wrapper-card .card { background: #0f172a !important; border-color: #1e293b !important; }
+html[data-theme='dark'] .donate-wrapper-card h1,
+html[data-theme='dark'] .donate-wrapper-card h2 { color: #f1f5f9 !important; }
+html[data-theme='dark'] .donate-wrapper-card .form-label { color: #e2e8f0; }
+html[data-theme='dark'] .donate-wrapper-card .btn-ghost { color: #e2e8f0; border-color: #334155; }
+html[data-theme='dark'] .donate-wrapper-card .need-pick-btn { background: #0f172a; border-color: #334155; }
+html[data-theme='dark'] .donate-wrapper-card .need-pick-name { color: #f1f5f9; }
+html[data-theme='dark'] .donate-wrapper-card .need-pick-qty { color: #94a3b8; }

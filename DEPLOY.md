@@ -21,44 +21,63 @@ Aiven MySQL requires SSL. The app uses `DB_SSL_ENABLED=true` to enable it.
 
 Optional: Download the CA certificate from Aiven’s service page and set `DB_CA_CERT` to its contents (for stricter validation).
 
-### Network access
-In Aiven, ensure your MySQL service allows connections from Render. Either add Render egress IPs to the allowlist, or use "Allow access from anywhere" (0.0.0.0/0) for development/demo.
+### Network access (IP allowlist)
+
+In the **Aiven console** → open your **MySQL service** → scroll to **Cloud and network**:
+
+- **IP address allowlist** — set to **Open to all** (or add `0.0.0.0/0`). Required for Render; its outbound IPs change.
+- If you see a warning icon next to “Open to all”, that is expected for demo/hackathon deploys.
+
+Render cannot connect if this stays restricted to specific IPs only.
 
 ---
 
 ## 2. Render (Web Service)
 
 ### Create Web Service
-1. Push your code to GitHub
-2. In [Render](https://render.com), **New → Web Service**
-3. Connect the GitHub repo
-4. Configure:
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-   - **Instance Type:** Free or paid
+
+**Blueprint (recommended)** — repo includes `render.yaml`:
+1. Push latest code to GitHub (`FaizanMalek/commonGround`)
+2. [Render](https://render.com) → **New → Blueprint**
+3. Connect the repo; Render reads `render.yaml`
+4. When prompted, enter:
+   - `DB_PASSWORD` — Aiven password
+   - `CORS_ORIGINS` — leave blank on first deploy, then set to your live URL and redeploy
+   - `ADMIN_DEFAULT_PASSWORD` — coordinator password for production
+
+**Manual Web Service**
+1. **New → Web Service** → connect repo
+2. Build: `npm install` · Start: `npm start` · Health check: `/api/health`
+3. Copy env vars from `render.env.example`
 
 ### Environment variables
-Set these in Render’s **Environment** tab:
+Use **Blueprint** (`render.yaml` in repo) or copy from `render.env.example`.
+
+Pre-configured for this project’s Aiven service (non-secrets in `render.yaml`):
 
 | Variable | Value |
 |----------|-------|
-| `NODE_ENV` | `production` |
-| `PORT` | `3000` (Render sets this automatically; keep for local) |
-| `DB_HOST` | Your Aiven host (e.g. `xxx.aivencloud.com`) |
-| `DB_PORT` | Aiven port (e.g. `22013`) |
-| `DB_USER` | Aiven user (e.g. `avnadmin`) |
-| `DB_PASSWORD` | Aiven password |
-| `DB_NAME` | Database name (e.g. `defaultdb` or `commonground`) |
+| `DB_HOST` | `commonground-commonground.h.aivencloud.com` |
+| `DB_PORT` | `16724` |
+| `DB_USER` | `avnadmin` |
+| `DB_NAME` | `defaultdb` |
 | `DB_SSL_ENABLED` | `true` |
-| `JWT_SECRET` | Long random string (e.g. `openssl rand -hex 32`) |
-| `COOKIE_SECURE` | `true` |
-| `COOKIE_SECRET` | Random string for signed cookies (e.g. `openssl rand -hex 32`) |
-| `CORS_ORIGINS` | Your Render URL (e.g. `https://your-app.onrender.com`) |
-| `ADMIN_DEFAULT_EMAIL` | `coordinator@gmhsc.ca` |
-| `ADMIN_DEFAULT_PASSWORD` | Strong password for coordinator |
+| `DB_CA_CERT_PATH` | `ca.pem` (committed in repo) |
+
+Set in Render dashboard (secrets):
+
+| Variable | Value |
+|----------|-------|
+| `DB_PASSWORD` | Your Aiven password |
+| `JWT_SECRET` | Auto-generated if using Blueprint, or random 32+ chars |
+| `COOKIE_SECRET` | Auto-generated if using Blueprint |
+| `CORS_ORIGINS` | `https://YOUR-SERVICE.onrender.com` (after first deploy) |
+| `ADMIN_DEFAULT_PASSWORD` | Coordinator login password |
+
+`PORT` is assigned by Render automatically. Do not commit passwords to git.
 
 ### Optional
-- `DB_CA_CERT` — Paste Aiven CA cert content if you use a custom CA
+- `DB_CA_CERT` — Inline cert instead of `DB_CA_CERT_PATH` (not needed if `ca.pem` is in repo)
 
 ---
 
@@ -106,9 +125,18 @@ Create a one-off job in Render that runs `npm run migrate` with the same env var
 - Set `DB_SSL_ENABLED=true`
 - If needed, add Aiven’s CA cert to `DB_CA_CERT`
 
-**CORS errors**
-- Add your Render URL to `CORS_ORIGINS` (e.g. `https://commonground-xxx.onrender.com`)
+**CORS errors (`Not allowed by CORS` in logs)**
+- Set **`CORS_ORIGINS`** to your exact Render URL, e.g. `https://commonground-xxxx.onrender.com` (no trailing slash).
+- Render also sets **`RENDER_EXTERNAL_URL`** automatically; recent app versions allow that without manual CORS setup.
+- Wrong URL (http vs https, typo, extra `/`) causes login/API to fail.
 
 **Cookies not persisting**
 - Set `COOKIE_SECURE=true` for HTTPS
 - Ensure `CORS_ORIGINS` includes the exact frontend origin and `credentials: true` is used
+
+**"Internal server error" on login**
+1. In Render **Logs**, look for `Login error:` or `ValidationError` / `X-Forwarded-For` (fixed in latest code via `trust proxy`).
+2. Run **`npm run migrate`** and **`npm run seed:demo`** in Render Shell if the DB is empty.
+3. Use the password that matches production: **`ADMIN_DEFAULT_PASSWORD`** from Render env (migrate uses this), or demo **`password123`** after `seed:demo`.
+4. Confirm **`JWT_SECRET`** is set (Blueprint auto-generates it).
+5. Set **`CORS_ORIGINS`** to your exact Render URL, e.g. `https://commonground-xxxx.onrender.com` (no trailing slash).

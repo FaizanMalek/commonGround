@@ -1,34 +1,51 @@
-# Render Blueprint - set env vars in Render Dashboard (do not commit secrets)
-# Services: https://dashboard.render.com
-# Add these env vars in your Web Service → Environment
+# Render Blueprint — https://dashboard.render.com
+# Connect repo: FaizanMalek/commonGround
+# Set secrets in Dashboard when prompted: DB_PASSWORD, CORS_ORIGINS (after first deploy)
 
 services:
   - type: web
     name: commonground
     runtime: node
+    region: ohio
+    plan: free
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
 
     envVars:
       - key: NODE_ENV
         value: production
+      - key: HOST
+        value: 0.0.0.0
       - key: DB_HOST
-        sync: false
+        value: commonground-commonground.h.aivencloud.com
       - key: DB_PORT
-        sync: false
+        value: "16724"
       - key: DB_USER
-        sync: false
+        value: avnadmin
       - key: DB_PASSWORD
         sync: false
       - key: DB_NAME
-        sync: false
+        value: defaultdb
       - key: DB_SSL_ENABLED
         value: "true"
+      - key: DB_CA_CERT_PATH
+        value: ca.pem
       - key: JWT_SECRET
         generateValue: true
       - key: COOKIE_SECURE
         value: "true"
+      - key: COOKIE_SAME_SITE
+        value: lax
       - key: COOKIE_SECRET
         generateValue: true
       - key: CORS_ORIGINS
         sync: false
+      - key: ADMIN_DEFAULT_EMAIL
+        value: coordinator@commonground.ca
+      - key: ADMIN_DEFAULT_PASSWORD
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "200"

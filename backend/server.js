@@ -20,6 +20,9 @@ const aiRoutes = require('./routes/ai.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Required on Render/Heroku etc. — express-rate-limit uses X-Forwarded-For
+app.set('trust proxy', 1);
+
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -36,15 +39,24 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
-const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
+const normalizeOrigin = (url) => (url || '').trim().replace(/\/$/, '');
+
+const allowedOrigins = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean);
+if (process.env.RENDER_EXTERNAL_URL) {
+    allowedOrigins.push(normalizeOrigin(process.env.RENDER_EXTERNAL_URL));
+}
 allowedOrigins.push(`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`);
 
 app.use(cors({
     origin: (origin, cb) => {
         if (!origin) return cb(null, true);
-        if (allowedOrigins.includes(origin)) return cb(null, true);
+        if (allowedOrigins.includes(normalizeOrigin(origin))) return cb(null, true);
         if (process.env.NODE_ENV === 'development') return cb(null, true);
-        cb(new Error('Not allowed by CORS'));
+        logger.warn('CORS blocked origin', { origin, allowed: allowedOrigins });
+        cb(null, false);
     },
     credentials: true
 }));
@@ -130,6 +142,11 @@ const start = async () => {
     const ok = await testConnection();
     if (!ok) {
         logger.error('Database connection failed. Run: npm run migrate');
+        process.exit(1);
+    }
+
+    if (!process.env.JWT_SECRET) {
+        logger.error('JWT_SECRET is not set — login will fail');
         process.exit(1);
     }
 
